@@ -1,0 +1,155 @@
+<div class="mt-4">
+
+	{{#if session.email}}
+
+	<ul id="list-courses" data-value={{completed}}>
+
+	</ul>
+
+	<input type="hidden" id="completed" value={{completed}} ></input>
+
+	{{else}}
+
+	<title>Welcome to My Website</title>
+	<style>
+		body {
+			background-color: #f2f2f2;
+			font-family: Arial, sans-serif;
+		}
+
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+			font-size: 36px;
+			color: #333;
+		}
+
+		.button-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			margin-top: 500px !important;
+		}
+		body {
+			background-image: url(src\resources\scss\background.png);
+			background-repeat: no-repeat;
+			background-size: cover;
+			}
+
+		button {
+			padding: 10px 20px;
+			font-size: 16px;
+			border-radius: 500px;
+			border: none;
+			color: #fff;
+			cursor: pointer;
+			margin-top: 20px;
+			margin-right: 500px;
+		}
+
+		.login {
+			background-color: #4CAF50;
+
+		}
+
+		.continue {
+			background-color: #008CBA;
+		}
+
+		.register {
+			background-color: #00ba4a;
+		}
+	</style>
+
+	<body>
+		<h1>Welcome </h1>
+		<div class="container">
+			<a href="/account/login"><button class="login">Log In</button></a>
+			<a href="/account/register"><button class="register">Register</button></a>
+			<a href="/countinue"><button class="continue">Continue Without Logging In</button></a>
+		</div>
+	</body>
+	{{/if}}
+</div>
+
+
+
+
+
+<script>
+	var lessonsApi = 'http://localhost:3000/g_lessons'
+
+
+	var a = document.getElementById('list-courses')
+	var b = document.getElementById('completed')
+	const str = b.value
+	const lid = str.split(',')
+	const lidArray = []
+	var c = 0
+	//const value = JSON.parse(a.getAttribute('data-value'));
+	console.log(b.value)
+	getData()
+
+	async function getData() {
+		const lessons = await fetch(lessonsApi)
+
+		//const data = await response.text()
+		const lessons_data = await lessons.json()
+		for( i = 0; i <lessons_data.length; i++){
+			//c=0
+			for(j = 0; j < lid.length; j++){
+				if(lessons_data[i].lid == lid[j]){
+					c=1
+					break
+				}
+				else{
+					c=0
+				}
+			}
+			if(c!=0)
+				lidArray.push(lessons_data[i].lid)
+			else
+				lidArray.push(0)
+		}
+		console.log(lidArray)
+		console.log(lessons_data[0].lid)
+		//var keys = Object.keys(data)
+		c = ``
+
+		for (i = 0; i < lessons_data.length; i++) {
+			console.log('i dau' +i)
+			c += `<div class="row">
+					<div class="col-sm-6 col-lg-4" unit="value1"> 
+					<div class="card card-course-item" >
+						<a href="/courses/{{slug}}/" >
+							<img src="{{image}}" class="card-img-top" alt="">
+						</a>
+						<a href="/courses/${lessons_data[i].question}/" >
+							<h5 class="card-title">${lessons_data[i].name}</h5>
+						</a>
+						<div class="card-body">
+							`
+
+				if (lessons_data[i].lid == lidArray[i]) {
+					c += `<p>Đã hoàn thành</p>
+						<a href="/learn/lesson/${lessons_data[i].lid}" class="btn btn-primary">Làm lại</a>`
+					
+				}
+				else {
+					c += `<a href="/learn/lesson/${lessons_data[i].lid}" class="btn btn-primary">Bắt đầu</a>`
+				}
+				
+			
+			c += `</div></div></div></div>`
+			console.log('sau i' +i)
+		}
+
+		document.querySelector("#list-courses").innerHTML = c
+		console.log(keys)
+	}
+
+
+
+	// end testing
+	var listCoursesBlock = document.querySelector("#list-courses")
+</script>

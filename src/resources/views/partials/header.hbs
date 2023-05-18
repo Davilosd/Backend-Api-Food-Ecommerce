@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="/">App</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="http://localhost:3000/">Trang chủ <span class="sr-only">(current)</span></a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Dropdown
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {{#if session.role}}
+                <a class="dropdown-item" href="/courses/create">Dang khoa hoc</a>
+            {{/if}}
+            {{#if session.email}}
+            <a class="dropdown-item" href="account/profile">Tài khoản {{session.email}}</a>
+            <a class="dropdown-item" href="/me/stored/courses">Khoa hoc cua toi</a>
+            {{!-- hien tai chi co role quan li va role nguoi dung, neu quan li thi se co du lieu, nguoi dung se la null --}}
+            
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="/account/logout">Đăng xuất</a>
+            {{else}}
+            <a class="dropdown-item" href="/account/login">Đăng nhập</a>
+            <a class="dropdown-item" href="/account/register">Đăng Ký</a>
+            {{/if}}
+
+          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link-disable" href="#"></a>
+        </li>
+      </ul>
+      <form action="/ptest" method="POST" class="form-inline my-2 my-lg-0">
+        
+      </form>
+    </div>
+  </div>
+</nav>

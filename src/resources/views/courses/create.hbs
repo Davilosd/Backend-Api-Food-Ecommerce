@@ -1,0 +1,89 @@
+<div class="mt-4">
+    <h3>Cap nhat khoa hoc</h3>
+    <form class="mt-4" action="/courses/store" method="POST" >
+        <div class="form-group">
+            <label for="name" class="form-label">ten</label>
+            <input type="text" class="form-control" id="name" name="name">
+        </div>
+        <div class="form-group">
+            <label for="description" class="form-label">Mo ta</label>
+            <input type="text" class="form-control" id="description" name="description">
+        </div>
+        <div class="form-group">
+            <label for="description" class="form-label">image</label>
+            <input type="text" class="form-control" id="description" name="image">
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">sua khoa hoc</button>
+        <button id="create">create api</button>
+    </form>
+</div>
+    <div>
+        <h2>danh sach khoa hoc</h2>
+
+        <ul id="list-courses">
+            <li></li>
+        </ul>
+    </div>
+
+    <html lang="en">
+  
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content=
+    "width=device-width, initial-scale=1.0" />
+  
+  <link id="favicon" rel="icon" 
+      href="" sizes="16x16" />
+        
+  <!-- font-awesome library to make the 
+      webpage more appealing -->
+  <link rel="stylesheet" href=
+"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+</head>
+  
+<body>
+  <div class="content">
+    <div class="head">
+      <h1 id="head"></h1>
+    </div>
+    <div class="email">
+      <i class="fa fa-envelope" style=
+        "font-size: 15px; color: blue;"></i>
+      <a href="" id="email"> </a>
+    </div>
+    <div class="phone">
+      <i class="fa fa-phone" style=
+        "font-size: 15px; color: blue;"></i>
+      <a href="" id="phone"> </a>
+    </div>
+    <br />
+    <div id="user-img"></div>
+    <br />
+  
+    <div class="details">
+      <table>
+        <tr>
+          <td>Age</td>
+          <td><span id="age"></span></td>
+        </tr>
+        <tr>
+          <td>Gender</td>
+          <td><span id="gender"></span></td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td><span id="location"></span></td>
+        </tr>
+        <tr>
+          <td>Country</td>
+          <td><span id="country"></span></td>
+        </tr>
+      </table>
+    </div>
+    
+  </div>
+</body>
+  
+</html>

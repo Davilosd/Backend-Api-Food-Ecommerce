@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1>Quiz</h1>
+    
+    <input type="hidden" id="lid" value ={{lid}}></input>
+    <input type="hidden" id="token" value ={{token}}></input>
+    <input type="hidden" id="role" value ={{role}}></input>
+    <input type="hidden" id="rightAns" value ={{rightAns}}></input>
+    
+    
+    {{!-- <form id="quiz-form" > --}}
+    <form id="quiz-form" action="http://localhost:3000/learn/lesson/{{lid}}/complete" method="POST">
+    </form>
+    <div id="result"></div>
+  </div>
+</body>
+
+</html>
+<script>
+  var lid = document.getElementById('lid')
+  var token = document.getElementById('token')
+  var role = document.getElementById('role')
+  var rightAns = document.getElementById('rightAns')
+
+
+  
+  var questionsApi = `http://localhost:3000/g_question/${lid.value}/${role.value}/${token.value}`
+  var a = document.getElementById('list-courses')
+  getData()
+  async function getData() {
+    const questions = await fetch(questionsApi)
+    const questions_data = await questions.json()
+
+    const str = rightAns.value
+    const rightAnsArray = str.split(',')
+
+    c = ``
+    for (i = 0; i < questions_data.length; i++) {
+    
+      c += `<p style="font-weight: bold; font-size: 20px;">Question ${i+1}:<p>
+      
+      <p>${questions_data[i].question}</p>`
+      if (questions_data[i].img)
+        c += ` <img  alt="question image"  width="400" height="300"" src= "${questions_data[i].img}">`
+      if (rightAnsArray[i] == 1)
+        c+=`<p>Dung</p>`
+      else if (rightAnsArray[i] == 2)
+        c+='<p>Sai</p>'
+                  c+=`<p></p><label>
+                    <input type="radio" name="q${i + 1}" value="${questions_data[i].options[0]}">
+                    a. ${questions_data[i].options[0]}
+                  </label>
+                  <label>
+                    <input type="radio" name="q${i + 1}" value="${questions_data[i].options[1]}">
+                    b. ${questions_data[i].options[1]}
+                  </label>
+                  <label>
+                    <input type="radio" name="q${i + 1}" value="${questions_data[i].options[2]}">
+                    c. ${questions_data[i].options[2]}
+                  </label>
+                  <label>
+                    <input type="radio" name="q${i + 1}" value="${questions_data[i].options[3]}">
+                    c. ${questions_data[i].options[3]}
+                  </label>`
+                  
+    }
+    c += `<p>
+          <button type="submit" id="submit-btn">Submit</button></p>`
+
+    document.querySelector("#quiz-form").innerHTML = c
+
+    
+    const quizForm = document.getElementById('quiz-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const result = document.getElementById('result');
+    const correctAnswers = []
+    const reQuestions = []
+    const re_questions_data = []
+    const userAnswers = []
+    for (i = 0; i < questions_data.length; i++) {
+      correctAnswers.push(questions_data[i].answer)
+    }
+
+    let data1 = 0;
+    let score = 0;
+    quizForm.addEventListener('submit', e => {
+      //event.preventDefault();
+      for (i = 1; i <= questions_data.length; i++) {
+        userAnswers.push(quizForm.elements[`q${i}`].value)
+      }
+
+      userAnswers.forEach((answer, index) => {
+        if (answer == correctAnswers[index]) {
+          score++;
+        }
+      });
+    
+    console.log(quizForm)
+    
+    })
+
+
+
+ 
+  }
+// lam cai web so so thoi, tra loi dung 70% la cho di tiep
+</script>
