@@ -13,17 +13,12 @@ function accountApi(app) {
     app.post("/p_sign_ups/:password", async (request, response) => {
         try {
             var account = new AccountModel({email: request.body.email, password: request.params.password, fname: request.body.fName, lName: request.body.lName});
-            //var user = new UserModel({fname: request.body.fName, lName: request.body.lName, email: request.body.email})
-            var result1 = await account.save();
-            var result2 = await user.save();
-            response.send(account);
+            var result = await account.save();
 
-            console.log(request.body)
-            //response.redirect('/g_login/a');
+            response.send(result);
         } catch (error) {
             response.status(500).send(error);
         }
-        
     });
 
     app.get("/g_completed_lessons/:email", async (request, response) =>{
@@ -77,10 +72,7 @@ function accountApi(app) {
             const filter = { email: request.body.email };
             const update = { $set: request.body };
             const options = { new: true };
-            console.log("req " + request.body.fName+ request.body.email)
             const updatedProfile = await AccountModel.findOneAndUpdate(filter, update, options);
-
-            console.log("update " + updatedProfile)
             response.send(updatedProfile);
           } catch (error) {
             response.status(500).send(error);
@@ -97,22 +89,14 @@ function accountApi(app) {
 
     app.post("/p_lessonComplete", async (request, response) => {
         try {
-            
-            //var result = await AccountModel.find({ email: request.body.email, LessonComplete: request.body.lid }).select('email password role').exec();//request.body.email, password: request.body.password }).exec();
             console.log("lessoncomplete")
             var result1 = await AccountModel.find().select('email password role').exec();
             const completeLesson = new CompleteLessonModel({email: request.body.email, lid: request.body.lid})
-            completeLesson.save(function(err) {
-                if (err) return handleError(err);
-                // saved!
-              });
-            // save nua la xong
-            console.log(request.body.email)
-            console.log(request.body.lid)
-            console.log("request.body.lidasdasdasdasdasdasdasdasd")
-            //var result = await completeLesson.save();
+            if(request.body.email != "guess")
+                completeLesson.save(function(err) {
+                    if (err) return handleError(err);
+                });
             response.send(result);
-
             }
          catch (error) {
             response.status(500).send(error);

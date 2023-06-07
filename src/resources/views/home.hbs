@@ -31,7 +31,7 @@
 			margin-top: 500px !important;
 		}
 		body {
-			background-image: url(src\resources\scss\background.png);
+			background-image: url(http://localhost:3000/g_image/background2.jpg);
 			background-repeat: no-repeat;
 			background-size: cover;
 			}
@@ -66,7 +66,25 @@
 		<div class="container">
 			<a href="/account/login"><button class="login">Log In</button></a>
 			<a href="/account/register"><button class="register">Register</button></a>
-			<a href="/countinue"><button class="continue">Continue Without Logging In</button></a>
+
+			<form action="http://localhost:3000/account/login_is_success" method="POST" class="mt-4" id="form-2"> 
+      {{!-- <form action="http://localhost:3000/p_login" method="POST" class="mt-4" id="form-2"> --}}
+        <div class="spacer"></div>
+
+        <div class="form-group">
+
+          <input id="email" name="email" type="hidden" value="guess" class="form-control">
+          <span class="form-message"></span>
+        </div>
+
+        <div class="form-group">
+          <input id="password" name="password" type="hidden" value="guess" class="form-control">
+          <span class="form-message"></span>
+        </div>
+
+        	<button class="continue">Continue Without Logging In</button>
+      </form>
+			
 		</div>
 	</body>
 	{{/if}}

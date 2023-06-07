@@ -9,13 +9,8 @@ function loginApi(app) {
     app.post("/p_sign_up", async (request, response) => {
         try {
             var account = new Account({email: request.body.email, password: request.body.password});
-            var user = new User({email:request.body.email ,fName: request.body.fName, lName: request.body.lName})
-            var result = await account.save();
-            var result1 = await user.save();
-            response.send(result);
 
-            console.log(result1)
-            //response.redirect('/g_login/a');
+            var result = await account.save();
         } catch (error) {
             response.status(500).send(error);
         }
@@ -39,15 +34,13 @@ function loginApi(app) {
 
     app.post('/p_login', async (request, response, next) => {
       try {
-        const { email, password } = request.body;
-        const user = await Account.findOne({ email, password }).select('email password role fName lName phoneNumber').exec();
+        const { email, password } = request.body
+        const user = await Account.findOne({ email, password }).select('email password role fName lName phoneNumber').exec()
         if (user) {
-          const token = authorize.generateAuthToken(user);
+          const token = authorize.generateAuthToken(user)
           console.log("token " + token)
           user.token = token
-          //response.send({ user, token });
-          
-          response.send(user);
+          response.send(user)
         } else {
             
           response.status(400).send({
@@ -55,11 +48,10 @@ function loginApi(app) {
           });
         }
       } catch (error) {
-console.log("errora" + error) 
-            
-        response.status(500).send(error);
+        console.log("error: " + error) 
+        response.status(500).send(error)
       }
-    });
+    })
       
 
     app.get("/g_login", async (request, response) => {

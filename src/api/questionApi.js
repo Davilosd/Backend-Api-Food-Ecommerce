@@ -18,10 +18,7 @@ function questionApi(app) {
             console.log("asd")
             var questions = new QuestionModel({question: request.body.question, answer: request.body.answer, 
                 options: request.body.options, lesson: request.body.lesson,img: request.body.img});
-           // response.send(request.body);
             var result = await questions.save();
-            console.log( questions)
-            console.log("asdas" +  result)
             response.send(result);
         } catch (error) {
             console.log(error)
@@ -32,7 +29,6 @@ function questionApi(app) {
         app.get("/g_question", async (request, response) => {
         try {
             console.log("asd")
-            //var result = await UnitsModel.find().select('name level unitId').exec();
             var result = await QuestionModel.find().exec();
             response.send(result);
         } catch (error) {

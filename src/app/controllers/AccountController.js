@@ -13,6 +13,9 @@ class AccountController {
         req.session.destroy()
         res.redirect('/')
     }
+    continue(req,res,next){
+
+    }
     profile(req,res,next){
       async function getData() {
 

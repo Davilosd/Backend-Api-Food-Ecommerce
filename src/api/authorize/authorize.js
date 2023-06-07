@@ -2,13 +2,12 @@ const jwt = require('jsonwebtoken');
 
 const bcrypt = require('bcrypt');
 
-function generateAuthToken(user) {
+  function generateAuthToken(user) {
     const token = jwt.sign({ id: user.id }, "jwtPrivateKey", {
       expiresIn: '1h'
     });
     return token;
   }
-
   function auth(req, res, next) {
     console.log("console.log" +req.params.token)
     const authHeader = req.headers['authorization'];
@@ -17,12 +16,10 @@ function generateAuthToken(user) {
     if (req.params.token == null) {
       return res.sendStatus(401);
     }
-  
     jwt.verify(req.params.token, "jwtPrivateKey", (err, user) => {
       if (err) {
         return res.sendStatus(403);
       }
-
       req.user = user;
       next();
     });

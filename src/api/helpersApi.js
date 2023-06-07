@@ -9,11 +9,9 @@ function helpersApi(app) {
         try{
             var result = await Helpers.find().exec();
             res.send(result);
-
         } catch (error) {
             res.status(500).send(error);
         }
-
     })
 
     // %20 la nut cach
