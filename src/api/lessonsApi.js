@@ -58,16 +58,7 @@ function lessonsApi(app) {
         }
         });
 
-        app.get("/g_image/:filename", async (request, response) => {
-            try {
-                const filename = request.params.filename;
-                const imagePath = path.join(__dirname, 'images', filename);
-                response.sendFile(imagePath)
-            } catch (error) {
-                console.log(error)
-                response.status(500).send(error);
-            }
-        });
+
 
 
     }

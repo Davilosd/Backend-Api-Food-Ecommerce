@@ -1,19 +1,36 @@
-const mongoose = require('mongoose')
+const mysql = require('mysql');
 
-async function connect(){
 
-    try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/Languages', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-            
-        })
-        console.log('connect successfully')
-    } catch (error) {
-        console.log('connect failed') 
+async function connect() {
+  const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: '123123',
+    database: 'bandoan',
+  });
 
+  connection.connect((err) => {
+    if (err) {
+      console.log('connect failed:', err);
+    } else {
+      console.log('connect successfully');
     }
+  });
+
+  // You can perform database operations here using the "connection" object
+
+  // let sql = "select * from NHANVIEN"
+
+  // const selectDataQuery = 'SELECT * FROM users;';
+  // connection.query(sql, (err, results) => {
+  //   if (err) {
+  //     console.log('Error querying data:', err);
+  //   } else {
+  //     console.log('Data retrieved:', results);
+  //   }
+  // });
+
+  connection.end();
 }
 
-module.exports = { connect }
-
+module.exports = { connect };

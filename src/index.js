@@ -12,8 +12,15 @@ const bcrypt = require('bcrypt');
 const helpers = require('handlebars-helpers')();
 Handlebars.registerHelper(helpers);
 
+var cors = require('cors')
+
+
+
+
+
+
 const app = express()
-const port = 3000
+const port = 8080
 
 const route = require('./routes')
 
@@ -31,10 +38,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.urlencoded({
   extended: true
 }))
+app.use(bodyParser.urlencoded({
+  extended: true
+}))
 app.use(express.json())
 
 app.use(methodOverride('_method'))
-
+app.use(cors())
 //custom middleware
 app.use(SortMiddleware)
 // HTTP logger
@@ -89,6 +99,9 @@ route(app);
 app.listen(port, () => {
   console.log(`App listening on port ${port}`)
 })
+
+
+
 
 
 

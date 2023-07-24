@@ -9,6 +9,11 @@ const lessonsApi = require('./lessonsApi')
 const accountApi = require('./accountApi')
 const helpersApi = require('./helpersApi')
 
+// new
+const DonNhapApi = require('./DonNhapApi1')
+const MonAnApi = require('./MonAnApi')
+const HoaDonApi = require('./HoaDonApi')
+const Stripe = require('./Stripe.js')
  
 function api(app) {
     learnApi(app)
@@ -21,6 +26,12 @@ function api(app) {
     lessonsApi(app)
     accountApi(app)
     helpersApi(app)
+
+    //new
+    MonAnApi(app)
+    DonNhapApi(app)
+    Stripe(app)
+    HoaDonApi(app)
 }
 
 
