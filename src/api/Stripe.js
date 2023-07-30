@@ -9,62 +9,109 @@ const express = require('express')
 function Stripe(app) {
 
 app.post('/create-checkout-session', async (req, res) => {
-
+  try {
     const customer = await stripe.customers.create({
-        metadata:{
+        metadata: {
             userId: req.body.userId,
             cart: JSON.stringify(req.body.data)
         }
-    })
-    //console.log(typeof(req.body.cartItems))
-    // const values = Object.values(req.body.cartItems)
-    // const myArray = Object.values(req.body.cartItems);
-    // const array2 = myArray[0]
+    });
     console.log(typeof(req.body.data))
     console.log(req.body.userData)
-    const u = req.body.userData
-    const line_items =req.body.data.map((item) => {
+    const u = JSON.parse(req.body.data);
+    const b = req.body.userData
+    
+    const line_items =u.map((item) => {
+      let gia = item.gia
+      if(item.giagiam){
+        gia = item.giagiam
+      }
         return{
         price_data: {
             currency: 'vnd',
             product_data: {
                 name: item.tenmonan,
-                images: [item.hinhanh],
+                
                 description: item.mota,
                 metadata:{
                     id: item.idmonan,
     
                 }
             },
-            unit_amount: item.gia,
+            unit_amount: gia,
         },
         quantity: item.quantity,
     }
     })
-    sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai) values ('${u.lname +' '+ u.name}', '
-            ${u.address +', ' +u.city}', '${u.pn}', 6 );`)
+    sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai) values ('${b.lname +' '+ b.name}', '
+            ${b.address }', '${b.pn}', 5 );`)
+            
             .then((results) => {
-             
-              //console.log('Results:', results);
-              //response.send(results);
             })
             .catch((error) => {
              
               console.error('Error:', error);
-              response.status(500).send(error);
+              res.status(500).send(error);
             });
 
-  const session = await stripe.checkout.sessions.create({
-    customer: customer.id,
-    line_items,
-    mode: 'payment',
-    success_url: `http://localhost:3000/success`,
-    cancel_url: `http://localhost:3000/canceled`,
-  });
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.json({url: session.url})
-  //res.send('http://localhost:3000')
-  //res.redirect('http://localhost:3000');
+            let iddonhang;
+            
+
+            async function getIdDonHang() {
+              try {
+                const results = await sql.connect(`SELECT max(iddonhang) FROM bandoan.donhang;`);
+                iddonhang = results[0]['max(iddonhang)']+1 ;
+                console.log('iddonhang:', iddonhang);
+            
+                const requestBody = req.body;
+                console.log(req.body)
+                const cartItems = JSON.parse(requestBody.data);
+                console.log("b")
+                console.log(cartItems)
+                
+                const idmonanValues = cartItems.map(item => item.idmonan);
+                const giaValues = cartItems.map(item => {
+                  if (item.giagiam) 
+                    return item.giagiam 
+                  return item.gia
+                
+                });
+                const quantityValues = cartItems.map(item => item.quantity);
+            
+                for (let i = 0; i < cartItems.length; i++) {
+                  const idmonan = idmonanValues[i];
+                  const soluong = quantityValues[i];
+                  const gia = giaValues[i];
+            
+                  const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}');`);
+                  console.log('Inserted row:', result);
+                }
+            
+                //response.redirect('http://localhost:3000/success')
+                
+              } catch (error) {
+                console.log('loi roi')
+                console.error('Error:', error);
+                res.status(500).send(error);
+              }
+            }
+            
+             getIdDonHang();
+
+            const session = await stripe.checkout.sessions.create({
+              customer: customer.id,
+              line_items,
+              mode: 'payment',
+              success_url: `http://localhost:3000/success`,
+              cancel_url: `http://localhost:3000/canceled`,
+          });
+  
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.json({ url: session.url });
+      } catch (error) {
+          console.error('Error:', error);
+          res.status(500).send(error);
+      }
 });
 
 // This is your Stripe CLI webhook secret for testing your endpoint locally.

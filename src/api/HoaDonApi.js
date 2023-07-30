@@ -13,11 +13,12 @@ const path = require('path');
 //   });
 
 function HoaDonApi(app) {
+  
     // UNIT
         app.post("/checkout", async (request, response) => {
             const b = request.body
             sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai) values ('${b.lname +' '+ b.name}', '
-            ${b.address +', ' +b.city}', '${b.pn}', 5 );`)
+            ${b.address }', '${b.pn}', 4 );`)
             .then((results) => {
              
               //console.log('Results:', results);
@@ -35,13 +36,27 @@ function HoaDonApi(app) {
 async function getIdDonHang() {
   try {
     const results = await sql.connect(`SELECT max(iddonhang) FROM bandoan.donhang;`);
-    iddonhang = results[0]['max(iddonhang)'] + 1;
-    //console.log('iddonhang:', iddonhang);
+    iddonhang = results[0]['max(iddonhang)']+1 ;
+    console.log('iddonhang:', iddonhang);
 
     const requestBody = request.body;
+    console.log(request.body)
     const cartItems = JSON.parse(requestBody.cartItems);
+    console.log("b")
+    console.log(cartItems)
+    
     const idmonanValues = cartItems.map(item => item.idmonan);
-    const giaValues = cartItems.map(item => item.giagiam);
+    const giaValues = cartItems.map(item => {
+      if (item.giagiam) 
+        return item.giagiam 
+      return item.gia
+    
+    });
+
+    // if(item.giagiam)
+    //   giaValues = cartItems.map(item => item.giagiam);
+    // else
+    //   giaValues = cartItems.map(item => item.gia);
     const quantityValues = cartItems.map(item => item.quantity);
 
     for (let i = 0; i < cartItems.length; i++) {
@@ -50,7 +65,7 @@ async function getIdDonHang() {
       const gia = giaValues[i];
 
       const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}');`);
-      //console.log('Inserted row:', result);
+      console.log('Inserted row:', result);
     }
 
     response.redirect('http://localhost:3000/success')
@@ -63,6 +78,22 @@ async function getIdDonHang() {
 
 getIdDonHang();
         });
+
+        app.get("/don_hang_all", (request, response) => {
+            sql.connect("select * from donhang")
+              .then((results) => {
+                
+                //console.log('Results:', results[0]);
+                response.send(results);
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+          
+          
 
         app.post("/checkout_stripe", async (request, response) => {
             try {
@@ -93,6 +124,7 @@ getIdDonHang();
             response.status(500).send(error);
         }
         });
+        
         app.delete("/d_lesson/:id/:role/:token", async (request, response) => {
         try {
             var result = await LessonsModel.deleteOne({ _id: request.params.id }).exec();

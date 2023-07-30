@@ -74,7 +74,9 @@ function MonAnApi(app) {
               });
           });
           app.get("/mon_an/:id", (request, response) => {
+            //console.log('aaaaa' +request.params.id)
             //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+            //sql.connect(`select * from bandoan.donhang where donhang.iddonhang = '2'`)
             sql.connect(`call sp_chitietmonan('${request.params.id}');`)
               .then((results) => {
                 
@@ -87,7 +89,20 @@ function MonAnApi(app) {
                 response.status(500).send(error);
               });
           });
-
+          app.get("/mon_an_all", (request, response) => {
+            //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+            sql.connect(`SELECT * FROM bandoan.toan_bo_mon_an;`)
+              .then((results) => {
+                
+               // console.log('Results:', results[0][0]);
+                response.send(results);
+              })
+              .catch((error) => {
+                
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
           app.get("/toan_bo_mon_an", (request, response) => {
             sql.connect("SELECT * FROM bandoan.toan_bo_mon_an;")
               .then((results) => {
@@ -101,6 +116,36 @@ function MonAnApi(app) {
                 response.status(500).send(error);
               });
           });
+          app.get("/don_hang/:id", (request, response) => {
+            sql.connect(`select * from bandoan.donhang where donhang.iddonhang = '${request.params.id}'`)
+            //sql.connect(`call sp_chitietmonan('${request.params.id}');`)
+              .then((results) => {
+                
+               // console.log('Results:', results[0][0]);
+                response.send(results[0]);
+              })
+              .catch((error) => {
+                
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+
+          app.get("/ct_don_hang/:id", (request, response) => {
+            sql.connect(`call bandoan.sp_chi_tiet_don_hang('${request.params.id}')`)
+            //sql.connect(`call sp_chitietmonan('${request.params.id}');`)
+              .then((results) => {
+                
+               // console.log('Results:', results[0][0]);
+                response.send(results[0]);
+              })
+              .catch((error) => {
+                
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+
 
           app.get("/the_loai/:id", (request, response) => {
             sql.connect(`call bandoan.sp_loc_the_loai('${request.params.id}');`)
@@ -131,6 +176,115 @@ function MonAnApi(app) {
                 response.status(500).send(error);
               });
           });
+
+
+          // nhan vien giao hang
+          app.get("/ds_nv_gh", (request, response) => {
+            sql.connect(`SELECT * FROM bandoan.v_nv_giao_hang;`)
+              .then((results) => {
+             
+                console.log('Results:', results[0]);
+                response.send(results);
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+
+          app.post("/nv_gh", (request, response) => {
+             sql.connect(`UPDATE donhang SET manv='${request.body.idnhanvien}', trangthai = '${request.body.trangthai}' WHERE iddonhang = '${request.body.iddonhang}';`)
+              .then((results) => {
+             
+                response.redirect(`http://localhost:8000/orders/${request.body.iddonhang}`)
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+            
+          });
+
+          // tai khoan
+
+          app.post("/login", (request, response) => {
+            sql.connect(`call bandoan.sp_dang_nhap_nv('${request.body.email}', '${request.body.password}');`)
+             .then((results) => {
+            
+               response.send(results[0][0])
+             })
+             .catch((error) => {
+              
+               console.error('Error:', error);
+               response.status(500).send(error);
+             });
+           
+         });
+
+         app.post("/dang_nhap_kh", (request, response) => {
+          sql.connect(`call bandoan.sp_dang_nhap_kh('${request.body.email}', '${request.body.password}');`)
+           .then((results) => {
+          
+             response.send(results[0][0])
+           })
+           .catch((error) => {
+            
+             console.error('Error:', error);
+             response.status(500).send(error);
+           });
+         
+       });
+
+       app.post("/dang_ky", (request, response) => {
+        sql.connect(`call bandoan.sp_dk_tk('${request.body.email}', '${request.body.password}','${request.body.lname}','${request.body.name}','${request.body.address}, ${request.body.city}',${request.body.gender}, '${request.body.pn}');`)
+         .then((results) => {
+        
+           response.send('dk thanh cong')
+         })
+         .catch((error) => {
+          
+           console.error('Error:', error);
+           response.status(500).send(error);
+         });
+       
+     });
+
+
+
+         // thong ke
+         
+         app.post("/thong_ke", (request, response) => {
+          sql.connect(`call bandoan.sp_tong_ket('${request.body.tungay}', '${request.body.denngay}');`)
+           .then((results) => {
+          
+             response.send(results[0])
+           })
+           .catch((error) => {
+            
+             console.error('Error:', error);
+             response.status(500).send(error);
+           });
+         
+       });
+
+
+
+       // khach hang
+       app.get("/don_hang_kh/:id", (request, response) => {
+        sql.connect(`call bandoan.sp_don_hang_kh(${request.params.id});`)
+         .then((results) => {
+        
+           response.send(results[0])
+         })
+         .catch((error) => {
+          
+           console.error('Error:', error);
+           response.status(500).send(error);
+         });
+       
+     });
 
           app.get("/monan", (request, response) => {
             sql.connect("select * from NHANVIEN")
