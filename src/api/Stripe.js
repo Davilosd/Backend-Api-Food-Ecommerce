@@ -43,8 +43,8 @@ app.post('/create-checkout-session', async (req, res) => {
         quantity: item.quantity,
     }
     })
-    sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai) values ('${b.lname +' '+ b.name}', '
-            ${b.address }', '${b.pn}', 5 );`)
+    sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai, makh) values ('${b.lname +' '+ b.name}', '
+            ${b.address }', '${b.pn}', 5 , ${b.idkhachhang});`)
             
             .then((results) => {
             })
@@ -78,15 +78,25 @@ app.post('/create-checkout-session', async (req, res) => {
                 });
                 const quantityValues = cartItems.map(item => item.quantity);
             
+                // for (let i = 0; i < cartItems.length; i++) {
+                //   const idmonan = idmonanValues[i];
+                //   const soluong = quantityValues[i];
+                //   const gia = giaValues[i];
+            
+                //   const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}');`);
+                //   console.log('Inserted row:', result);
+                // }
+                const giaGoc = cartItems.map(item => item.gia);
                 for (let i = 0; i < cartItems.length; i++) {
                   const idmonan = idmonanValues[i];
                   const soluong = quantityValues[i];
                   const gia = giaValues[i];
+                  const giagoc = giaGoc[i];
             
-                  const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}');`);
+                  const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia, giagoc) VALUES (${iddonhang}, '${idmonan}', ${soluong}, ${gia}, ${giagoc});`);
                   console.log('Inserted row:', result);
                 }
-            
+
                 //response.redirect('http://localhost:3000/success')
                 
               } catch (error) {
