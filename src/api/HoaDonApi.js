@@ -17,8 +17,8 @@ function HoaDonApi(app) {
     // UNIT
         app.post("/checkout", async (request, response) => {
             const b = request.body
-            sql.connect(`insert into donhang (tennguoinhan, diachi, sdt, trangthai) values ('${b.lname +' '+ b.name}', '
-            ${b.address }', '${b.pn}', 4 );`)
+            sql.connect(`insert into donhang (tennguoinhan, makh, diachi, sdt, trangthai) values ('${b.lname +' '+ b.name}', ${b.idkhachhang}, 
+            '${b.address }', '${b.pn}', 4 );`)
             .then((results) => {
              
               //console.log('Results:', results);
@@ -52,6 +52,7 @@ async function getIdDonHang() {
       return item.gia
     
     });
+    const giaGoc = cartItems.map(item => item.gia);
 
     // if(item.giagiam)
     //   giaValues = cartItems.map(item => item.giagiam);
@@ -63,8 +64,9 @@ async function getIdDonHang() {
       const idmonan = idmonanValues[i];
       const soluong = quantityValues[i];
       const gia = giaValues[i];
+      const giagoc = giaGoc[i];
 
-      const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}');`);
+      const result = await sql.connect(`INSERT INTO chitietdonhang (iddonhang, idmonan, soluong, dongia ,giagoc) VALUES (${iddonhang}, '${idmonan}', '${soluong}', '${gia}', '${giagoc}');`);
       console.log('Inserted row:', result);
     }
 
@@ -80,7 +82,23 @@ getIdDonHang();
         });
 
         app.get("/don_hang_all", (request, response) => {
-            sql.connect("select * from donhang")
+            sql.connect(`select d.iddonhang, d.tennguoinhan, d.diachi, d.sdt, d.trangthai, d.makh, d.manv, n.ten, n.ho, d.ngaydat
+            from bandoan.donhang d 
+            left join nhanvien n on d.manv = n.idnhanvien`)
+              .then((results) => {
+                
+                //console.log('Results:', results[0]);
+                response.send(results);
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+
+          app.get("/don_hang_shipper", (request, response) => {
+            sql.connect("select * from donhang where trangthai = 5 || trangthai = 4")
               .then((results) => {
                 
                 //console.log('Results:', results[0]);

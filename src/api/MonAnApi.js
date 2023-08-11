@@ -21,7 +21,6 @@ function MonAnApi(app) {
           const imagePath = path.join(__dirname, 'images', filename);
           response.sendFile(imagePath)
       } catch (error) {
-          console.log(error)
           response.status(500).send(error);
       }
   });
@@ -38,7 +37,6 @@ function MonAnApi(app) {
             sql.connect("call sp_ban_chay();")
               .then((results) => {
                 
-                //console.log('Results:', results[0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -52,7 +50,6 @@ function MonAnApi(app) {
             sql.connect("call sp_san_pham_km();")
               .then((results) => {
                
-                //console.log('Results:', results[0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -66,7 +63,6 @@ function MonAnApi(app) {
             sql.connect("call sp_monmoi();")
               .then((results) => {
                 
-                //console.log('Results:', results[0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -75,14 +71,41 @@ function MonAnApi(app) {
                 response.status(500).send(error);
               });
           });
+
+          app.get("/gia", (request, response) => {
+            sql.connect("call sp_gia_tang_dan();")
+              .then((results) => {
+                
+                response.send(results[0]);
+              })
+              .catch((error) => {
+                
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+
+
           app.get("/mon_an/:id", (request, response) => {
-            //console.log('aaaaa' +request.params.id)
-            //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+          
             //sql.connect(`select * from bandoan.donhang where donhang.iddonhang = '2'`)
             sql.connect(`call sp_chitietmonan('${request.params.id}');`)
               .then((results) => {
                 
-               // console.log('Results:', results[0][0]);
+                response.send(results[0][0]);
+              })
+              .catch((error) => {
+                
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+          app.get("/tong_danh_gia/:id", (request, response) => {
+            //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+            //sql.connect(`select * from bandoan.donhang where donhang.iddonhang = '2'`)
+            sql.connect(`call sp_tong_danh_gia('${request.params.id}');`)
+              .then((results) => {
+                
                 response.send(results[0][0]);
               })
               .catch((error) => {
@@ -96,7 +119,6 @@ function MonAnApi(app) {
             sql.connect(`SELECT * FROM bandoan.v_all_mon_an_ch;`)
               .then((results) => {
                 
-               // console.log('Results:', results[0][0]);
                 response.send(results);
               })
               .catch((error) => {
@@ -109,7 +131,6 @@ function MonAnApi(app) {
             sql.connect("SELECT * FROM bandoan.toan_bo_mon_an;")
               .then((results) => {
              
-                //console.log('Results:', results);
                 response.send(results);
               })
               .catch((error) => {
@@ -126,7 +147,7 @@ function MonAnApi(app) {
             sql.connect("SELECT * FROM bandoan.toan_bo_mon_an;")
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.json({results: results, count: results.length});
               })
               .catch((error) => {
@@ -138,14 +159,11 @@ function MonAnApi(app) {
           // them
           app.post("/them_mon_an/:idnv", (request, response) => {
             const data = request.body
-            console.log('dataaaaaaaaaaaaaa '+ request.body)
             sql.connect(`call bandoan.sp_them_mon
-              ('${data.idmonan}', '${data.tenmonan}', '${data.mota}','${data.hinhanh}',${data.trangthai} ,'${data.theloai}'
-              , '${data.gia}', '${request.params.idnv}') `)
+              ('${data.idmonan}', '${data.tenmonan}', '${data.mota}','${data.hinhanh}',${data.trangthai}) `)
 
               .then((results) => {
              
-                //console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -163,7 +181,6 @@ function MonAnApi(app) {
             tenmonan = '${data.tenmonan}', mota= '${data.mota}', hinhanh='${data.hinhanh}', trangthai = ${data.trangthai}, theloai='${data.theloai}'
             WHERE idmonan = '${data.idmonan}' `)
               .then((results) => {
-                //console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -176,12 +193,10 @@ function MonAnApi(app) {
 
           app.post('/them_gia_mon_an/:idnv', (request, response) => {
             const dataGia = request.body
-            console.log('dbasd' + dataGia)
             sql.connect(`
               INSERT INTO gia (idmonan, gia, idnhanvien) 
               values ('${dataGia.id}' ,${dataGia.gia}, '${request.params.idnv}'); `)
               .then((results) => {
-                console.log('Results:', results);
                 response.send('Row Inserted')
               })
               .catch((error) => {
@@ -198,7 +213,6 @@ function MonAnApi(app) {
               INSERT INTO chebien (idmonan, idnguyenlieu, soluong) 
               values ('${request.params.idm}' ,'${data.idnguyenlieu}', ${data.soluong}); `)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -215,7 +229,6 @@ function MonAnApi(app) {
               UPDATE chebien SET
               soluong = ${data.soluong} where idmonan = '${request.params.idm}' and idnguyenlieu= '${data.idnguyenlieu}'; `)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -231,7 +244,6 @@ function MonAnApi(app) {
             
             sql.connect(`DELETE FROM chebien WHERE idmonan = '${request.params.idm}' and idnguyenlieu = '${request.params.idnl}'`)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -246,7 +258,7 @@ function MonAnApi(app) {
             sql.connect(`DELETE FROM monan WHERE idmonan = '${request.params.id}' `)
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.status(200).send('Row del')
               })
               .catch((error) => {
@@ -260,7 +272,7 @@ function MonAnApi(app) {
             sql.connect(`select * from gia where idmonan = '${request.params.id}'`)
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.send(results)
               })
               .catch((error) => {
@@ -270,11 +282,13 @@ function MonAnApi(app) {
               });
           });
 
+
+          // --------------------------- THE LOAI ----------------------
           app.get("/the_loai_all", (request, response) => {
             sql.connect(`select * from theloai `)
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.send(results)
               })
               .catch((error) => {
@@ -284,12 +298,59 @@ function MonAnApi(app) {
               });
           });
 
+          app.post('/them_tl', (request, response) => {
+            const data = request.body
+            
+            sql.connect(`
+              INSERT INTO theloai (idtheloai, tentheloai) 
+              values ('${data.idtheloai}' ,'${data.tentheloai}'); `)
+              .then((results) => {
+                response.status(200).send('Row Inserted')
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          })
+
+          app.post('/sua_tl', (request, response) => {
+            const data = request.body
+            
+            sql.connect(`
+              UPDATE theloai SET
+              tentheloai = '${data.tentheloai}' where idtheloai = '${data.idtheloai}'; `)
+              .then((results) => {
+                response.status(200).send('Row Inserted')
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          })
+
+          app.post('/xoa_tl/:id', (request, response) => {
+            const data = request.body
+            
+            
+            sql.connect(`DELETE FROM theloai WHERE idtheloai = '${request.params.id}'`)
+              .then((results) => {
+                response.status(200).send('Row Inserted')
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          })
+          ////////////////////////////////// THE LOAI /////////////////
           app.get("/che_bien/:id", (request, response) => {
-            sql.connect(`select cb.idnguyenlieu, cb.soluong, nl.tennguyenlieu from chebien cb  join nguyenlieu nl 
+            sql.connect(`select cb.idnguyenlieu, cb.soluong, nl.tennguyenlieu, nl.donvi from chebien cb  join nguyenlieu nl 
             on nl.idnguyenlieu = cb.idnguyenlieu where idmonan='${request.params.id}' `)
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.send(results)
               })
               .catch((error) => {
@@ -304,7 +365,7 @@ function MonAnApi(app) {
             //sql.connect(`call sp_chitietmonan('${request.params.id}');`)
               .then((results) => {
                 
-               // console.log('Results:', results[0][0]);
+               //   ('Results:', results[0][0]);
                 response.send(results);
               })
               .catch((error) => {
@@ -314,6 +375,21 @@ function MonAnApi(app) {
               });
           });
 
+          app.get("/don_hang_tt/:tt", (request, response) => {
+            sql.connect(`select d.iddonhang, d.tennguoinhan, d.diachi, d.sdt, d.trangthai, d.makh, d.manv, n.ten, n.ho, d.ngaydat
+            from bandoan.donhang d 
+            left join nhanvien n on d.manv = n.idnhanvien where d.trangthai = ${request.params.tt}`)
+              .then((results) => {
+                
+                //  ('Results:', results[0]);
+                response.send(results);
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
 
 
 
@@ -323,7 +399,7 @@ function MonAnApi(app) {
             sql.connect("SELECT d.iddonnhap, d.idnhanvien, nv.ten, d.ngaynhap FROM bandoan.donnhap d join bandoan.nhanvien nv on d.idnhanvien = nv.idnhanvien;")
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.json(results);
               })
               .catch((error) => {
@@ -338,7 +414,6 @@ function MonAnApi(app) {
             values ('${request.params.idnv}');`)
               .then((results) => {
              
-                console.log('Results:', results);
                 response.json(results);
               })
               .catch((error) => {
@@ -355,7 +430,6 @@ function MonAnApi(app) {
               UPDATE chitietdonnhap SET
               soluong = ${data.soluong}, dongia = ${data.dongia} where iddonnhap = '${request.params.idm}' and idnguyenlieu= '${data.idnguyenlieu}'; `)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -371,7 +445,6 @@ function MonAnApi(app) {
             
             sql.connect(`DELETE FROM chitietdonnhap WHERE iddonnhap = '${request.params.idm}' and idnguyenlieu = '${request.params.idnl}'`)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -381,14 +454,43 @@ function MonAnApi(app) {
               });
           })
 
-          
+          app.get("/don_nhap/:id", (request, response) => {
+            sql.connect(`SELECT dn.idnhanvien, dn.ngaynhap, nv.ho, nv.ten  from donnhap dn join nhanvien nv on nv.idnhanvien = dn.idnhanvien 
+            where iddonnhap = ${request.params.id};`)
+              .then((results) => {
+             
+                //  ('Results:', results);
+                response.json(results[0]);
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+            })
+
+            app.post('/sua_don_nhap/:id', (request, response) => {
+              const data = request.body
+              
+              sql.connect(`
+                UPDATE donnhap SET
+                idnhanvien = '${data.idnhanvien}', ngaynhap = '${data.ngaynhap}' where iddonnhap = '${request.params.id}'; `)
+                .then((results) => {
+                  response.status(200).send('Row Inserted')
+                })
+                .catch((error) => {
+                 
+                  console.error('Error:', error);
+                  response.status(500).send(error);
+                });
+            })
 
           app.get("/ct_don_nhap/:id", (request, response) => {
-            sql.connect(`SELECT ct.idnguyenlieu, ct.dongia, ct.soluong, nl.tennguyenlieu 
+            sql.connect(`SELECT ct.idnguyenlieu, ct.dongia, ct.soluong, nl.tennguyenlieu, nl.donvi
             from bandoan.chitietdonnhap ct join nguyenlieu nl on nl.idnguyenlieu = ct.idnguyenlieu where iddonnhap = ${request.params.id};`)
               .then((results) => {
              
-                //console.log('Results:', results);
+                //  ('Results:', results);
                 response.json(results);
               })
               .catch((error) => {
@@ -400,12 +502,10 @@ function MonAnApi(app) {
 
           app.post("/them_ct_dn/:id", (request, response) => {
             const data = request.body
-            console.log('dt' + data)
             sql.connect(`INSERT INTO chitietdonnhap (iddonnhap, idnguyenlieu, soluong, dongia) 
             values (${request.params.id},'${data.idnguyenlieu}', ${data.soluong}, ${data.dongia});`)
               .then((results) => {
              
-                console.log('Results:', results);
                 response.json(results);
               })
               .catch((error) => {
@@ -422,7 +522,6 @@ function MonAnApi(app) {
               UPDATE chitietdonnhap SET
               soluong = ${data.soluong}, dongia = ${data.dongia} where iddonnhap = '${request.params.idm}' and idnguyenlieu= '${data.idnguyenlieu}'; `)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -438,7 +537,6 @@ function MonAnApi(app) {
             
             sql.connect(`DELETE FROM chitietdonnhap WHERE iddonnhap = '${request.params.idm}' and idnguyenlieu = '${request.params.idnl}'`)
               .then((results) => {
-                console.log('Results:', results);
                 response.status(200).send('Row Inserted')
               })
               .catch((error) => {
@@ -459,7 +557,7 @@ function MonAnApi(app) {
             //sql.connect(`call sp_chitietmonan('${request.params.id}');`)
               .then((results) => {
                 
-               // console.log('Results:', results[0][0]);
+               //  ('Results:', results[0][0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -474,7 +572,7 @@ function MonAnApi(app) {
             //sql.connect(`call sp_chitietmonan('${request.params.id}');`)
               .then((results) => {
                 
-               // console.log('Results:', results[0][0]);
+               //  ('Results:', results[0][0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -489,7 +587,7 @@ function MonAnApi(app) {
             sql.connect(`call bandoan.sp_loc_the_loai('${request.params.id}');`)
               .then((results) => {
              
-                //console.log('Results:', results[0]);
+                // ('Results:', results[0]);
                 response.send(results[0]);
               })
               .catch((error) => {
@@ -505,7 +603,6 @@ function MonAnApi(app) {
             sql.connect(`call bandoan.sp_con_lai('${request.params.id}');`)
               .then((results) => {
              
-                console.log('Results:', results[0]);
                 response.send(results[0][0]);
               })
               .catch((error) => {
@@ -521,7 +618,6 @@ function MonAnApi(app) {
             sql.connect(`SELECT * FROM bandoan.v_nv_giao_hang;`)
               .then((results) => {
              
-                console.log('Results:', results[0]);
                 response.send(results);
               })
               .catch((error) => {
@@ -550,8 +646,12 @@ function MonAnApi(app) {
           app.post("/login", (request, response) => {
             sql.connect(`call bandoan.sp_dang_nhap_nv('${request.body.email}', '${request.body.password}');`)
              .then((results) => {
-            
-               response.send(results[0][0])
+              const user = results[0][0]
+              const token = authorize.generateAuthToken(user)
+               
+               user.token = token
+                
+               response.send(user)
              })
              .catch((error) => {
               
@@ -589,14 +689,43 @@ function MonAnApi(app) {
        
      });
 
+     app.post("/doi_mk", (request, response) => {
+      sql.connect(`call bandoan.sp_doi_mk('${request.body.email}', '${request.body.oldPwd}','${request.body.newPwd}');`)
+       .then((results) => {
+      
+         response.send(results)
+       })
+       .catch((error) => {
+        
+         console.error('Error:', error);
+         response.status(500).send(error);
+       });
+     
+   });
 
+   
 
+   app.post("/doi_tttk", (request, response) => {
+    const data= request.body
+    sql.connect(`UPDATE khachhang SET 
+    ho = '${data.lname}', ten= '${data.name}', sdt='${data.pn}', diachi = '${data.address}'
+    WHERE email = '${data.email}'`)
+     .then((results) => {
+    
+       response.send(results)
+     })
+     .catch((error) => {
+      
+       console.error('Error:', error);
+       response.status(500).send(error);
+     });
+   
+ });
          // thong ke
          
-         app.post("/thong_ke", (request, response) => {
+         app.post("/thong_ke/:role/:token", authorize.auth, authorize.authorize(4),(request, response) => {
           sql.connect(`call bandoan.sp_tong_ket_thu_chi('${request.body.tungay}', '${request.body.denngay}');`)
            .then((results) => {
-          console.log('thuchi' + results[0])
              response.send(results[0])
            })
            .catch((error) => {
@@ -624,7 +753,34 @@ function MonAnApi(app) {
        
      });
 
+     app.get("/danh_gia_all/:id", (request, response) => {
+      sql.connect(`call bandoan.sp_danh_gia_mon_an(${request.params.id});`)
+       .then((results) => {
+      
+         response.send(results[0])
+       })
+       .catch((error) => {
+        
+         console.error('Error:', error);
+         response.status(500).send(error);
+       });
+     
+   });
 
+   app.post("/danh_gia", (request, response) => {
+    const data = request.body
+    sql.connect(`INSERT INTO danhgiamonan (idmonan, idkhachhang, diemdanhgia, binhluan) 
+    values ('${data.productId}',${data.userId}, ${data.rating}, '${data.comment}');`)
+      .then((results) => {
+     
+        response.json(results);
+      })
+      .catch((error) => {
+       
+        console.error('Error:', error);
+        response.status(500).send(error);
+      });
+  });
 
 
 
@@ -635,7 +791,7 @@ function MonAnApi(app) {
       sql.connect(`SELECT * FROM bandoan.nguyenlieu;`)
         .then((results) => {
           
-         // console.log('Results:', results[0][0]);
+         //  ('Results:', results[0][0]);
           response.send(results);
         })
         .catch((error) => {
@@ -649,10 +805,9 @@ function MonAnApi(app) {
       const data = request.body
       
       sql.connect(`
-        INSERT INTO nguyenlieu (idnguyenlieu, tennguyenlieu) 
-        values ('${data.idnguyenlieu}', '${data.tennguyenlieu}'); `)
+        INSERT INTO nguyenlieu (idnguyenlieu, tennguyenlieu, donvi) 
+        values ('${data.idnguyenlieu}', '${data.tennguyenlieu}', ${data.donvi}); `)
         .then((results) => {
-          console.log('Results:', results);
           response.status(200).send('Row Inserted')
         })
         .catch((error) => {
@@ -667,9 +822,8 @@ function MonAnApi(app) {
       
       sql.connect(`
         UPDATE nguyenlieu SET
-        tennguyenlieu = '${data.tennguyenlieu}' where idnguyenlieu= '${data.idnguyenlieu}'; `)
+        tennguyenlieu = '${data.tennguyenlieu}', donvi = '${data.donvi}' where idnguyenlieu= '${data.idnguyenlieu}'; `)
         .then((results) => {
-          console.log('Results:', results);
           response.status(200).send('Row Inserted')
         })
         .catch((error) => {
@@ -685,7 +839,6 @@ function MonAnApi(app) {
       
       sql.connect(`DELETE FROM nguyenlieu WHERE idnguyenlieu = '${request.params.idnl}'`)
         .then((results) => {
-          console.log('Results:', results);
           response.status(200).send('Row Inserted')
         })
         .catch((error) => {
@@ -705,11 +858,162 @@ function MonAnApi(app) {
 
      /////////////////////////////////////////////////////CRUD THE LOAI //////////////////////////////////////////////////////
 
+     //--------------------------------------------------- CRUD KHUYEN MAI --------------------------------------------------
+     app.get("/km_all", (request, response) => {
+      //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+      sql.connect(`SELECT g.idkhuyenmai, g.idnhanvien, g.tenkhuyenmai, g.ngaybatdau, g.ngayketthuc, nv.ten FROM khuyenmai g join nhanvien nv where nv.idnhanvien =g.idnhanvien;`)
+        .then((results) => {
+          
+         //  ('Results:', results[0][0]);
+          response.send(results);
+        })
+        .catch((error) => {
+          
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    });
+    app.post('/them_km/:id', (request, response) => {
+      const data = request.body
+      
+      sql.connect(`
+        INSERT INTO khuyenmai (idkhuyenmai, tenkhuyenmai, idnhanvien) 
+        values ('${data.idkhuyenmai}', '${data.tenkhuyenmai}', ${request.params.id}); `)
+        .then((results) => {
+           
+          response.status(200).send('Row Inserted')
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+    app.post('/sua_km', (request, response) => {
+      const data = request.body
+      
+      sql.connect(`
+        UPDATE khuyenmai SET
+        mota = '${data.mota}', ngaybatdau = '${data.ngayBD}', ngayketthuc = '${data.ngayKT}' where idkhuyenmai= '${data.id}'; `)
+        .then((results) => {
+          
+          response.status(200).send('Row Inserted')
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+    app.get('/xoa_km/:idnl', (request, response) => {
+      const data = request.body
+      
+      
+      sql.connect(`DELETE FROM khuyenmai WHERE idkhuyenmai = '${request.params.idnl}'`)
+        .then((results) => {
+          response.status(200).send('Row Inserted')
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+
+    app.get("/km/:id", (request, response) => {
+      //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+      sql.connect(`SELECT g.idkhuyenmai, g.idnhanvien, g.tenkhuyenmai, g.ngaybatdau, g.mota, g.ngayketthuc, nv.ten, nv.ho FROM khuyenmai g join nhanvien nv where nv.idnhanvien =g.idnhanvien and g.idkhuyenmai = '${request.params.id}';`)
+        .then((results) => { 
+          
+          response.send(results[0]);
+        })
+        .catch((error) => {
+          
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    });
+
+    app.get("/ct_km/:id", (request, response) => {
+      //sql.connect(`select * from monan where idmonan=${request.params.id};`)
+      sql.connect(`SELECT k.idmonan, k.phantramkhuyenmai, m.tenmonan from monankhuyenmai k join monan m where m.idmonan = k.idmonan and idkhuyenmai = '${request.params.id}';`)
+        .then((results) => { 
+          
+          response.send(results);
+        })
+        .catch((error) => {
+          
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    });
+
+    app.post("/them_ct_km/:id", (request, response) => {
+      const data = request.body
+      sql.connect(`INSERT INTO monankhuyenmai (idmonan, idkhuyenmai, phantramkhuyenmai) 
+      values (${data.idmonan},'${request.params.id}', ${data.phantramkhuyenmai});`)
+        .then((results) => {
+       
+          response.json(results);
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    });
+
+    app.post('/sua_ct_km/:idm', (request, response) => {
+      const data = request.body
+      
+      sql.connect(`
+        UPDATE monankhuyenmai SET
+        phantramkhuyenmai = ${data.phantramkhuyenmai} where idmonan = '${data.idmonan}' and idkhuyenmai= '${request.params.idm}'; `)
+        .then((results) => {
+          response.status(200).send('Row Inserted')
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+
+    app.get('/xoa_ct_km/:idm/:idnl', (request, response) => {
+      const data = request.body
+      
+      
+      sql.connect(`DELETE FROM monankhuyenmai WHERE idmonan = '${request.params.idnl}' and idkhuyenmai = '${request.params.idm}'`)
+        .then((results) => {
+          response.status(200).send('Row Inserted')
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+    
+    app.get('/mon_an_km', (request, response) => {
+      const data = request.body
+      
+      
+      sql.connect(`SELECT * FROM bandoan.v_khuyen_mai;`)
+        .then((results) => {
+          response.send(results);
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+     ///////////////////////////////////////////////////// CRUD KHUYEN MAI /////////////////////////////////////////////////
+
           app.get("/monan", (request, response) => {
             sql.connect("select * from NHANVIEN")
               .then((results) => {
                 
-                //console.log('Results:', results);
                 response.send(results);
               })
               .catch((error) => {
@@ -722,7 +1026,6 @@ function MonAnApi(app) {
             sql.connect(`CALL them_mon_an('3', '2','2',2,'','');`)
               .then((results) => {
                 // Use the `results` here
-                //console.log('Results:', results);
                 response.send(results);
               })
               .catch((error) => {
@@ -766,13 +1069,12 @@ function MonAnApi(app) {
                 const imagePath = path.join(__dirname, 'images', filename);
                 response.sendFile(imagePath)
             } catch (error) {
-                //console.log(error)
+                //  (error)
                 response.status(500).send(error);
             }
         });
 
         app.get("/:sx/:loc", async (request, response) => {
-          console.log("asd" + request.params.sx + request.params.loc);
         
           try {
             let kq;
@@ -781,13 +1083,16 @@ function MonAnApi(app) {
               const results = await sql.connect(`call bandoan.sp_loc_the_loai_moi('${request.params.loc}');`);
               kq = results[0];
             } else if (request.params.sx == 'mua_nhieu') {
-              console.log("wtf");
               const results = await sql.connect(`call bandoan.sp_loc_the_loai_hot('${request.params.loc}');`);
               kq = results[0];
             } else if (request.params.sx == 'khuyen_mai') {
               const results = await sql.connect(`call bandoan.sp_loc_the_loai_km('${request.params.loc}');`);
               kq = results[0];
             }
+              else if (request.params.sx == 'gia'){
+                const results = await sql.connect(`call bandoan.sp_loc_the_loai_gia('${request.params.loc}') `)
+                kq = results[0];
+              }
         
             response.send(kq);
           } catch (error) {

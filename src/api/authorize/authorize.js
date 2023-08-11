@@ -26,7 +26,7 @@ const bcrypt = require('bcrypt');
   }
   function authorize(role) {
     return (req, res, next) => {
-      if (req.params.role !== role && req.params.role != 'admin') {
+      if (req.params.role !== role && req.params.role != 4) {
         return res.sendStatus(403);
       }
       next();
