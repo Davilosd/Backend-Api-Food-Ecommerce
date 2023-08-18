@@ -116,7 +116,7 @@ function MonAnApi(app) {
           });
           app.get("/mon_an_all", (request, response) => {
             //sql.connect(`select * from monan where idmonan=${request.params.id};`)
-            sql.connect(`SELECT * FROM bandoan.v_all_mon_an_ch;`)
+            sql.connect(`SELECT * FROM monan;`)
               .then((results) => {
                 
                 response.send(results);
@@ -156,6 +156,34 @@ function MonAnApi(app) {
                 response.status(500).send(error);
               });
           });
+          app.get("/ct_mon_an_full/:id", (request, response) => {
+            console.log('ád')
+            sql.connect(`SELECT * FROM bandoan.monan where idmonan = '${request.params.id}';`)
+              .then((results) => {
+                console.log('ávvd')
+                //  ('Results:', results);
+                response.send(results[0])
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
+          app.get("/gia_mon_an/:id", (request, response) => {
+            console.log('ád')
+            sql.connect(`select * from bandoan.v_gia_hien_tai where idmonan = '${request.params.id}';`)
+              .then((results) => {
+                console.log('ávvd')
+                //  ('Results:', results);
+                response.send(results[0])
+              })
+              .catch((error) => {
+               
+                console.error('Error:', error);
+                response.status(500).send(error);
+              });
+          });
           // them
           app.post("/them_mon_an/:idnv", (request, response) => {
             const data = request.body
@@ -178,7 +206,7 @@ function MonAnApi(app) {
             const data = request.body
             sql.connect(`
             UPDATE monan SET 
-            tenmonan = '${data.tenmonan}', mota= '${data.mota}', hinhanh='${data.hinhanh}', trangthai = ${data.trangthai}, theloai='${data.theloai}'
+            tenmonan = '${data.tenmonan}', trangthai = ${data.trangthai}, theloai =  '${data.theloai}', hinhanh =   '${data.hinhanh}'
             WHERE idmonan = '${data.idmonan}' `)
               .then((results) => {
                 response.status(200).send('Row Inserted')
@@ -603,7 +631,7 @@ function MonAnApi(app) {
             sql.connect(`call bandoan.sp_con_lai('${request.params.id}');`)
               .then((results) => {
              
-                response.send(results[0][0]);
+                response.send(results[0]);
               })
               .catch((error) => {
                
@@ -676,14 +704,14 @@ function MonAnApi(app) {
        });
 
        app.post("/dang_ky", (request, response) => {
-        sql.connect(`call bandoan.sp_dk_tk('${request.body.email}', '${request.body.password}','${request.body.lname}','${request.body.name}','${request.body.address}, ${request.body.city}',${request.body.gender}, '${request.body.pn}');`)
+        sql.connect(`call bandoan.sp_dk_tk('${request.body.email}', '${request.body.password}','${request.body.lname}','${request.body.name}','${request.body.address} ${request.body.city}',${request.body.gender}, '${request.body.pn}');`)
          .then((results) => {
         
            response.send('dk thanh cong')
          })
          .catch((error) => {
           
-           console.error('Error:', error);
+           //console.error('Error:', error);
            response.status(500).send(error);
          });
        
@@ -780,8 +808,25 @@ function MonAnApi(app) {
         console.error('Error:', error);
         response.status(500).send(error);
       });
-  });
 
+      
+       
+     
+  });
+  app.get("/da_mua/:idma/:idkh", (request, response) => {
+    console.log('âsdasd')
+    sql.connect(`select ct.idmonan, dh.makh from chitietdonhang ct join donhang dh on dh.iddonhang = ct.iddonhang 
+                    where ct.idmonan='${request.params.idma}' and dh.makh ='${request.params.idkh}'`)
+     .then((results) => {
+    
+       response.send(results[0])
+     })
+     .catch((error) => {
+      
+       console.error('Error:', error);
+       response.status(500).send(error);
+     });
+    });
 
 
      // ------------------------------------ -------- CRUD THE LOAI ----------------------------------------------------------
@@ -1009,6 +1054,39 @@ function MonAnApi(app) {
         });
     })
      ///////////////////////////////////////////////////// CRUD KHUYEN MAI /////////////////////////////////////////////////
+
+     // ------------------------------------------------- CHE BIEN --------------------------------------------------------
+
+     app.get('/che_bien_all/:sl', (request, response) => {
+      const data = request.body
+      const params = request.params.sl
+      
+      sql.connect(`call bandoan.sp_tinh_so_nl_can_all(${params});`)
+        .then((results) => {
+          response.send(results[0]);
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+
+    app.get('/che_bien/:sl/:id', (request, response) => {
+      const data = request.body
+      const params = request.params.sl
+      const params2 = request.params.id
+      sql.connect(`call bandoan.sp_tinh_so_nl_can(${params}, '${params2}');`)
+        .then((results) => {
+          response.send(results[0]);
+        })
+        .catch((error) => {
+         
+          console.error('Error:', error);
+          response.status(500).send(error);
+        });
+    })
+     /////////////////////////////////////////////////// CHE BIEN //////////////////////////////////////////////////////////
 
           app.get("/monan", (request, response) => {
             sql.connect("select * from NHANVIEN")
